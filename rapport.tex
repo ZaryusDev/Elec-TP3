@@ -6,9 +6,9 @@
 \usepackage{centrale}
 
 \hypersetup{
-  pdftitle={Compte-Rendu TP2},
+  pdftitle={Compte-Rendu TP3},
   pdfauthor={Aymeric ZIMINSKI / Zaryus},
-  pdfsubject={Compte-rendu TP2},
+  pdfsubject={Compte-rendu TP3},
   pdfproducer={Conversion PDF},
   pdfkeywords={Quelques mots-clés} %
 }
@@ -36,7 +36,7 @@
 
     % Titre
     \rule{\linewidth}{0.5mm} \\[0.4cm]
-    { \huge \bfseries TP2 : Filtres actifs passe bas\\[0.4cm] }
+    { \huge \bfseries TP3 : Étude d'une alimentation buck\\[0.4cm] }
     \rule{\linewidth}{0.5mm} \\[1.5cm]
 
     % Auteur(es) et encadrant(es)
@@ -78,9 +78,9 @@
 
 \section{Introduction}
 
-L'objectif de cette séance de TP est l'implémentation de filtres actifs passe bas du premier et du second ordre. Nous allons dans un premier temps étudier les caractéristiques théoriques de ces filtres, puis nous allons les implémenter et les tester.
+L'objectif de ce TP est de réaliser une étude sur une alimentation à découpage de type buck. Nous allons utiliser le composant MC34063 de Microchip.
 
-Nous devrons mettre en application la théorie que nous avons vu en cours, notamment sur les filtres du second ordre, et sur les amplificateurs opérationnels.
+Nous devrons mettre en application la théorie que nous avons vu en cours, notamment sur alimentations à découpage et leurs caractéristiques.
 
 
 % --------------------------------------------------------------
@@ -88,19 +88,12 @@ Nous devrons mettre en application la théorie que nous avons vu en cours, notam
 % --------------------------------------------------------------
 
 \pagebreak
-\section{Etude d'un filtre du premier ordre}
-\subsection{Partie théorique}
-
-\begin{figure}[ht!]
-    \centering
-    \includegraphics[width=0.6\textwidth]{fig1.png}
-    \caption{Premier filtre}
-    \label{fig:filtre1}
-\end{figure}
+\section{Commande PWM à 100kHz}
+\subsection{Configuration de la PWM}
 
 \vspace{2cm}
 
-Nous allons calculer l'impédence équivalente du condencateur $C_2$ et de la résistance $R_2$.
+Nous souhaitons dans un premier temps connaître le rapport cyclique nécessaire pour que le buck soit en mode CCM.
 
 Nous savons que les admittances s'ajoutent en parallèle. 
 
