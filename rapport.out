@@ -1,8 +1,6 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
-\BOOKMARK [1][-]{section.2}{Commande\040PWM\040\340\040100kHz}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{Configuration\040de\040la\040PWM}{section.2}% 3
-\BOOKMARK [2][-]{subsection.2.2}{Partie\040pratique}{section.2}% 4
-\BOOKMARK [1][-]{section.3}{Etude\040d'un\040filtre\040du\040second\040ordre}{}% 5
-\BOOKMARK [2][-]{subsection.3.1}{Partie\040th\351orique}{section.3}% 6
-\BOOKMARK [2][-]{subsection.3.2}{Partie\040pratique}{section.3}% 7
-\BOOKMARK [1][-]{section.4}{Conclusion}{}% 8
+\BOOKMARK [1][-]{section.2}{Commande\040en\040boucle\040ouverte}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Commande\040de\040la\040PWM\040\340\040100kHz}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Lecture\040de\040la\040tension\040de\040sortie}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Limites\040en\040boucle\040ouverte}{section.2}% 5
+\BOOKMARK [1][-]{section.3}{Conclusion}{}% 6
