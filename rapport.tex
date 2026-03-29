@@ -1,0 +1,376 @@
+% !TEX encoding = UTF-8 Unicode
+% -*- coding: UTF-8; -*-
+% vim: set fenc=utf-8
+\documentclass[a4paper,12pt,french]{article}
+
+\usepackage{centrale}
+
+\hypersetup{
+  pdftitle={Compte-Rendu TP2},
+  pdfauthor={Aymeric ZIMINSKI / Zaryus},
+  pdfsubject={Compte-rendu TP2},
+  pdfproducer={Conversion PDF},
+  pdfkeywords={Quelques mots-clés} %
+}
+
+\DeclareGraphicsRule{.ai}{pdf}{.ai}{} % Pour insérer des documents .ai
+\graphicspath{{./img/} {./eps/} {./fig/}} % Pour ne pas avoir à ajouter eps/ton-image.jpg
+
+% ------------- Packages spéciaux, nécessaires pour ce rapport, à insérer ici ------------- 
+\usepackage{minted}
+
+
+\begin{document}
+
+% --------------------------------------------------------------
+%                       Page de garde
+% --------------------------------------------------------------
+
+\begin{titlepage}
+  \begin{center}
+
+    \includegraphics[width=0.5\textwidth]{LogoECN.jpg}\\[1cm]
+
+    {\large Electronique}\\[0.5cm]
+    {\large Systèmes Embarqués Communiquants}\\[0.5cm]
+
+    % Titre
+    \rule{\linewidth}{0.5mm} \\[0.4cm]
+    { \huge \bfseries TP2 : Filtres actifs passe bas\\[0.4cm] }
+    \rule{\linewidth}{0.5mm} \\[1.5cm]
+
+    % Auteur(es) et encadrant(es)
+    \noindent
+    \begin{minipage}{0.4\textwidth}
+      \begin{flushleft} \large
+        \emph{Auteur :}\\
+        M. Guillaume \textsc{PIRAUBE}\\
+        M. Aymeric \textsc{ZIMINSKI}
+      \end{flushleft}
+    \end{minipage}%
+    \begin{minipage}{0.4\textwidth}
+%      \begin{flushright} \large
+%        \emph{Encadrants :} \\
+%        M.~Prénom \textsc{Nom}\\
+%        M.~Prénom \textsc{Nom}
+%      \end{flushright}
+    \end{minipage}
+
+    \vfill
+
+    % Date en fin de page
+    {\large Version du\\ \today}
+
+  \end{center}
+\end{titlepage}
+
+% --------------------------------------------------------------
+%                    Table des matières 
+% --------------------------------------------------------------
+
+\thispagestyle{empty}
+\tableofcontents
+\pagebreak
+
+% --------------------------------------------------------------
+%                         Début du corps
+% --------------------------------------------------------------
+
+\section{Introduction}
+
+L'objectif de cette séance de TP est l'implémentation de filtres actifs passe bas du premier et du second ordre. Nous allons dans un premier temps étudier les caractéristiques théoriques de ces filtres, puis nous allons les implémenter et les tester.
+
+Nous devrons mettre en application la théorie que nous avons vu en cours, notamment sur les filtres du second ordre, et sur les amplificateurs opérationnels.
+
+
+% --------------------------------------------------------------
+%                         Partie 1
+% --------------------------------------------------------------
+
+\pagebreak
+\section{Etude d'un filtre du premier ordre}
+\subsection{Partie théorique}
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{fig1.png}
+    \caption{Premier filtre}
+    \label{fig:filtre1}
+\end{figure}
+
+\vspace{2cm}
+
+Nous allons calculer l'impédence équivalente du condencateur $C_2$ et de la résistance $R_2$.
+
+Nous savons que les admittances s'ajoutent en parallèle. 
+
+Ainsi, $Y_{eq} = Y_{C2} + Y_{R2}$
+
+\begin{align*}
+    Y_{C2} &= \frac{1}{Z_{C2}} = j\omega C_2 \\
+    Y_{R2} &= \frac{1}{Z_{R2}} = \frac{1}{R_2} \\
+    Y_{eq} &= j\omega C_2 + \frac{1}{R_2} \\
+    Z_{eq} &= \frac{1}{Y_{eq}} = \frac{1}{j\omega C_2 + \frac{1}{R_2}} = \frac{R_2}{j\omega C_2 R_2 + 1}
+\end{align*}
+
+
+\vspace{2cm}
+
+Appliquons le théorème de Millman pour calculer $V_-$ :
+
+\begin{align*}
+    V_- &= \frac{\frac{V_e}{R_1} + \frac{V_s}{Z_{eq}} }{ \frac{1}{R_1} + \frac{1}{Z_{eq}} } \\
+    &= \frac{V_e \cdot Z_{eq} + V_s \cdot R_1}{R_1 + Z_{eq}} \\
+\end{align*}
+
+\vspace{1cm}
+
+Supposons que l'emplificateur est idéal, alors $V_+ = V_-$. Or, $V_+ = 0$, donc $V_- = 0$.
+
+\begin{align*}
+  V_- = V_+ &\implies V_- = 0 \\
+  & \implies \frac{V_e \cdot Z_{eq} + V_s \cdot R_1}{R_1 + Z_{eq}} = 0 \\
+  & \implies V_s \cdot R_1 = - V_e \cdot Z_{eq} \\
+  & \implies \frac{V_s}{V_e} = - \frac{Z_{eq}}{R_1} \\
+  & \implies \frac{V_s}{V_e} = - \frac{R_2}{R_1} \times \frac{1}{1 + jC_2 R_2 \omega}
+\end{align*}
+
+En posant $\omega_0 = \frac{1}{R_2 C_2}$, on trouve que :
+
+\[
+  H(j\omega) = - \frac{R_2}{R_1} \times \frac{1}{1 + j \frac{\omega}{\omega_0}}
+\]
+
+
+\vspace{1cm}
+
+Nous avons ainsi que la fréquence de coupure de $H$ est $f_0 = \frac{\omega_0}{2\pi} = \frac{1}{2\pi R_2 C_2}$.
+
+\vspace{1cm}
+
+Nous souhaitons que : 
+
+\begin{itemize}
+  \item $C_2 = 10 nF$
+  \item Le gain statique soit de 1.6
+  \item La fréquence de coupure soit de 1 kHz
+\end{itemize}
+
+Nous souhaitons maintenant connaitre la valeur des résistances. 
+
+Nous pouvons déterminer le gain statique de $H$ par : 
+
+\begin{align*}
+  |H(0)| &=  \frac{R_2}{R_1} \times \frac{1}{1 + j \frac{0}{\omega_0}} \\
+  &= \frac{R_2}{R_1} \\
+  &= 1.6
+\end{align*}
+
+Donc $R_2 = 1.6 R_1$.
+
+\vspace{1cm}
+
+Nous savons que la fréquence de coupure de $H$ est $f_0 = \frac{\omega_0}{2 \pi}= \frac{1}{2 \pi R_2 C_2}$, donc : 
+\begin{align*}
+  f_0 &= \frac{1}{2 \pi R_2 C_2} \\
+  R_2 &= \frac{1}{2 \pi f_0 C_2} \\
+  R_2 &= \frac{1}{2\pi \cdot (1 \cdot 10^3 \text{ Hz})\cdot (10 \cdot 10^{-9} \text{ F})} \\
+  R_2 &\approx 15.9 \text{ k}\Omega
+\end{align*}
+
+Nous avons que le gain statique est de 1.6, or, la caractérisitique fréquencielle de l'AOP est de $G= 3000$ autour de 1 kHz, donc nous avons un gain statique suffisant pour que l'amplificateur ne soit pas saturé.
+
+\subsection{Partie pratique}
+
+Nous avons pris pour résistance $R_1$ la valeur de $10 k\Omega$, et pour résistance $R_2$ la valeur de $15 k\Omega$. Nous avons pris pour condensateur $C_2$ la valeur de $10 nF$.
+
+Nous avons du prendre une résitance de $15 k\Omega$ au lieu de $15.9 k\Omega$ car nous n'avions pas de résistance de $15.9 k\Omega$ à notre disposition.
+
+Le diagramme de bode de ce filtre sera légèrement modifié par rapport à celui du filtre idéal, mais il devrait être assez proche de celui du filtre idéal.
+
+
+Nous obtenons ainsi le diagramme de Bode suivant : 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{filtre_premier_ordre.png}
+    \caption{Diagramme de Bode du premier filtre}
+    \label{fig:bode1_1}
+\end{figure}
+
+Nous pouvons constater que la fréquence de coupure est de 1.16 kHz au lieu de 1 kHz, ce qui est cohérent avec le fait que nous avons pris une résistance de $15 k\Omega$ au lieu de $15.9 k\Omega$. 
+
+\vspace{0.5cm}
+
+Nous allons maintenant prendre les valeurs du diagramme de Bode en 100 Hz et en 10kHz :
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{point_important_mont1_1.png}
+    \caption{Diagramme de Bode du premier filtre en 100 Hz}
+    \label{fig:bode1_2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{point_important_mont1_2.png}
+    \caption{Diagramme de Bode du premier filtre en 10kHz}
+    \label{fig:bode1_3}
+\end{figure}
+
+\pagebreak
+% --------------------------------------------------------------
+%                            Partie 2
+% --------------------------------------------------------------
+
+\section{Etude d'un filtre du second ordre}
+
+\subsection{Partie théorique}
+
+Nous supposons que $R_1 = R_2 = R$.
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[width=0.6\textwidth]{fig2.png}
+    \caption{Second filtre}
+    \label{fig:filtre2}
+\end{figure}
+
+Nous souhaitons déterminer la fonction de transfert $H$ du second filtre.
+
+Dans un premier temps, déterminons $v_a$ en fonction de $v_{in}$ et $v_{out}$, et $v_b$ en fonction de $v_a$ et $v_{out}$.
+
+\vspace{1cm}
+
+Applicons le théorème de Millman sur $v_a$ :
+
+\begin{align*}
+  v_a &= \frac{ \frac{v_{out}}{Z_{C1}} + \frac{v_{in}}{R} + \frac{v_{out}}{R} }{\frac{1}{Z_{C1}} + \frac{1}{R} + \frac{1}{R} } \\
+  &= \frac{v_{out}R + v_{in} Z_{C1} + v_{out}Z_{C1}}{R + 2Z_{C1}} \\
+  &= \frac{v_{out}(R + Z_{C1})  + v_{in} Z_{C1}}{R + 2Z_{C1}}\\
+  &= \frac{v_{out}(R+ \frac{1}{jC_1\omega}) + v_{in}\times \frac{1}{jC_1\omega}}{R + \frac{2}{jC_1 \omega}}\\
+  &= \frac{v_{out} (jRC_1\omega + 1) + v_{in}}{jRC_1 \omega + 2}
+\end{align*}
+
+\vspace{1cm}
+
+
+Applicons le théorème de Millman sur $v_b$ :
+
+\begin{align*}
+  v_b &= \frac{\frac{v_a}{R}}{\frac{1}{R} + jC_2 \omega} \\
+  &= \frac{v_a}{1 + jRC_2 \omega}
+\end{align*}
+
+Nous supposons que l'amplificateur est idéal, alors $v_+ = v_-$. Or, $v_- = v_{out}$, donc $v_- = v_{out}$. Donc $v_b = v_{out}$, ainsi $v_a = v_{out} (1 + jRC_2 \omega)$.
+
+\begin{align*}
+  v_a & = v_{out} (1 + jRC_2 \omega) \\
+  &\iff  \frac{v_{out} (jRC_1\omega + 1) + v_{in}}{jRC_1 \omega + 2} = v_{out} (1 + jRC_2 \omega) \\
+  & \iff v_{out} (jRC_1\omega + 1) + v_{in} = v_{out} (1 + jRC_2 \omega)(jRC_1 \omega + 2) \\
+  & \iff v_{in} = v_{out} ((1 + jRC_2 \omega)(jRC_1 \omega + 2) - (jRC_1\omega + 1)) \\
+  & \iff \frac{v_{out}}{v_{in}} = \frac{1}{(1 + jRC_2 \omega)(jRC_1 \omega + 2) - (jRC_1\omega + 1)}\\
+  & \iff \frac{v_{out}}{v_{in}} = \frac{1}{1 + 2 jRC_2 \omega + j^2 R^2 C_1 C_2 \omega^2}\\ 
+  & \iff H(j\omega) = \frac{v_{out}}{v_{in}} = \frac{1}{\frac{(j\omega)^2}{\omega_{0}^2} + 2 \xi \cdot \frac{j\omega}{\omega_0} + 1}\\
+\end{align*}
+
+En posant $\omega_0 = \frac{1}{R \sqrt{C_1 C_2}}$ et $\xi = \sqrt{\frac{C_2}{C_1}}$.\\
+
+
+
+
+
+\vspace{1cm}
+Nous supposons maintenant que : 
+\begin{itemize}
+  \item $\xi = \frac{\sqrt{2}}{2}$
+  \item $R = 10 k\Omega$
+  \item $f_0 = 1 \; kHz$
+\end{itemize}
+
+\vspace{1cm}
+
+Nous souhaitons maintenant calculer $C_1$ et $C_2$ : 
+\begin{align*}
+  \xi &= \sqrt{\frac{C_2}{C_1}} = \frac{\sqrt{2}}{2} \\
+  & \implies C_2 = \frac{C_1}{2}
+\end{align*}
+
+\begin{align*}
+  f_0 &= \frac{\omega_0}{2\pi} = 1 \cdot 10^3 \text{ Hz} \\
+  & \implies \omega_0 = 2\pi \cdot 10^3 \text{ rad/s} \\
+  & \implies \frac{1}{R \sqrt{C_1C_2}} = 2\pi \cdot 10^3 \text{ rad/s} \\
+  & \implies \frac{1}{\sqrt{C_1C_2}} = 2\pi \cdot 10^3 \cdot R \\
+  & \implies \sqrt{C_1C_2} = \frac{1}{2\pi \cdot 10^3 \cdot R} \\
+  & \implies \sqrt{C_1 \times \frac{C_1}{2}} = \frac{1}{2\pi \cdot 10^3 \cdot R} \\
+  & \implies C_1 = \sqrt{2} \cdot \frac{1}{2\pi \cdot 10^3 \cdot R} \\
+  & \implies C_1 \approx 22.5 \text{ nF} \\
+  & \implies C_2 \approx 11.2 \text{ nF}
+ \end{align*}
+
+\subsection{Partie pratique}
+
+Nous avons pris pour résistance $R$ la valeur de $10 k\Omega$, pour condensateur $C_1$ la valeur de $20 nF$, et pour condensateur $C_2$ la valeur de $10 nF$.
+
+Nous navions pas de condensateur de $22.5 nF$ ni de condensateur de $11.2 nF$, nous avons donc pris les condensateurs les plus proches de ces valeurs : nous avons mis deux condensateurs de $10 nF$ en parallèle pour obtenir un condensateur de $20 nF$, et nous avons pris un condensateur de $10 nF$ pour $C_2$.
+
+Nous obtenons ainsi le diagramme de Bode suivant : 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{shallenkey_point_1k.png}
+    \caption{Diagramme de Bode du second filtre}
+    \label{fig:bode2}
+\end{figure}
+
+\vspace{0.5cm}
+
+Nous allons mainenant prendre les valeurs du diagramme de bode en 100Hz et 10kHz
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{shallenkey_point_100.png}
+    \caption{Diagramme de Bode du second filtre en 100Hz}
+    \label{fig:bode2_1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{shallenkey_point_10k.png}
+    \caption{Diagramme de Bode du second filtre en 10kHz}
+    \label{fig:bode2_2}
+\end{figure}
+% --------------------------------------------------------------
+%                            Conclusion
+% --------------------------------------------------------------
+
+\pagebreak
+\section{Conclusion}
+
+Nous avons réussi à caractériser les composants autour des différents filtres. Nous avons pus vérifier nos résultats théoriques, en pratique, grâce à l'ossciloscope. \\
+Nos résultats sont en cohérence avec la théorie. 
+
+
+% --- Biblio par .bib
+%\bibliography{ici-ton-fichier-biblio}
+%\bibliographystyle{plain-fr.bst}
+%\selectlanguage{french}
+
+% --- Biblio écrite à la main
+%\begin{thebibliography}{7}
+%\bibitem[Bastien 2019]{id-de-la-source}
+%Auteurs : \emph{Un titre},  une date.
+%\end{thebibliography}
+
+% --------------------------------------------------------------
+%                            Appendices
+% --------------------------------------------------------------
+
+%\pagebreak
+%\appendix
+%\begin{appendices}
+%\section{}
+
+
+%\end{appendices}
+
+\end{document}
